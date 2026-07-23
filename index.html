@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cvećara Latica — Praćenje prodaje</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #F8F4FB;
+  --card: #FFFFFF;
+  --ink: #2B2333;
+  --ink-soft: #7C7289;
+  --plum: #3D2650;
+  --iris: #7C4FA0;
+  --iris-dark: #5E3A7D;
+  --iris-soft: #F0E4F7;
+  --lilac: #C9A6DE;
+  --lilac-soft: #EDE1F5;
+  --gold: #B4863F;
+  --gold-soft: #F4E9D6;
+  --grid: #E9DEF0;
+  --stem: #BFA0D4;
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Inter', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--cream); }
+body { font-family: var(--font-body); color: var(--ink); }
+
+.cv-root { max-width: 900px; margin: 0 auto; padding: 28px 20px 70px; }
+
+.cv-header-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.cv-brand { display: flex; align-items: center; gap: 12px; }
+.cv-brand-mark { display: flex; align-items: flex-end; }
+.cv-brand h1 { font-family: var(--font-display); font-weight: 600; font-size: 28px; letter-spacing: -0.01em; margin: 0; color: var(--plum); }
+.cv-sub { margin: 2px 0 0; font-size: 13px; color: var(--ink-soft); }
+.stem-divider { width: 100%; height: 20px; margin-top: 14px; display: block; }
+
+.cv-toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin: 16px 0 4px; }
+
+.cv-banner { background: var(--gold-soft); border: 1px solid #E4CE9F; color: #6b5423; font-size: 13px; padding: 10px 14px; border-radius: 10px; margin: 16px 0; line-height: 1.5; }
+.cv-banner strong { color: #5a4419; }
+
+.cv-btn { font-family: var(--font-body); font-weight: 600; font-size: 13.5px; border-radius: 999px; padding: 10px 18px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: transform .12s ease, box-shadow .12s ease, background .12s ease; }
+.cv-btn:focus-visible { outline: 2px solid var(--plum); outline-offset: 2px; }
+.cv-btn-primary { background: var(--iris); color: #FBF7FE; box-shadow: 0 2px 8px rgba(124,79,160,.32); }
+.cv-btn-primary:hover { background: var(--iris-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(124,79,160,.38); }
+.cv-btn-ghost { background: transparent; color: var(--ink-soft); border: 1px solid var(--grid); }
+.cv-btn-ghost:hover { background: var(--lilac-soft); color: var(--plum); }
+.cv-btn-sm { padding: 7px 13px; font-size: 12.5px; }
+.cv-btn svg { display: block; }
+
+.cv-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 22px 0; }
+@media (max-width: 700px) { .cv-stats { grid-template-columns: repeat(2, 1fr); } }
+.cv-stat-card { background: var(--card); border: 1px solid var(--grid); border-radius: 14px; padding: 14px 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+.cv-stat-icon { width: 30px; height: 30px; border-radius: 9px; display: flex; align-items: center; justify-content: center; }
+.cv-stat-label { font-size: 12px; color: var(--ink-soft); }
+.cv-stat-value { font-family: var(--font-mono); font-size: 19px; font-weight: 600; color: var(--ink); letter-spacing: -0.01em; }
+.cv-stat-value-sm { font-size: 14px; font-family: var(--font-body); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.cv-chart-card { background: var(--card); border: 1px solid var(--grid); border-radius: 16px; padding: 18px 16px; margin-bottom: 26px; }
+.cv-chart-card h2 { font-family: var(--font-display); font-size: 17px; font-weight: 600; margin: 0 0 14px; color: var(--plum); }
+.cv-chart-bars { display: flex; align-items: flex-end; gap: 6px; height: 150px; }
+.cv-bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
+.cv-bar { width: 100%; max-width: 26px; background: var(--iris); border-radius: 5px 5px 0 0; min-height: 3px; transition: background .12s ease; }
+.cv-bar:hover { background: var(--iris-dark); }
+.cv-bar-label { font-size: 10px; font-family: var(--font-mono); color: var(--ink-soft); }
+
+.cv-list-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.cv-list-head h2 { font-family: var(--font-display); font-size: 19px; font-weight: 600; margin: 0; color: var(--plum); }
+.cv-filters { display: flex; gap: 8px; flex-wrap: wrap; }
+.cv-filters select { font-family: var(--font-body); font-size: 12.5px; border: 1px solid var(--grid); background: var(--card); color: var(--ink); border-radius: 8px; padding: 7px 10px; }
+
+.cv-empty { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 46px 20px; border: 1px dashed var(--grid); border-radius: 16px; color: var(--ink-soft); font-size: 14px; text-align: center; }
+
+.cv-tickets { display: flex; flex-direction: column; gap: 10px; }
+.cv-ticket { position: relative; display: flex; align-items: center; gap: 8px; background: var(--card); border: 1px solid var(--grid); border-radius: 12px; padding: 14px 16px; overflow: hidden; }
+.cv-ticket-notch { position: absolute; width: 14px; height: 14px; background: var(--cream); border-radius: 50%; top: 50%; transform: translateY(-50%); }
+.cv-ticket-notch-l { left: -7px; border-right: 1px solid var(--grid); }
+.cv-ticket-notch-r { right: 44px; border-left: 1px solid var(--grid); }
+.cv-ticket-main { flex: 1; min-width: 0; }
+.cv-ticket-row1 { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.cv-ticket-product { font-weight: 700; font-size: 14.5px; color: var(--ink); }
+.cv-ticket-total { font-family: var(--font-mono); font-weight: 600; font-size: 14.5px; color: var(--iris); white-space: nowrap; }
+.cv-ticket-meta { margin-top: 6px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-size: 12px; color: var(--ink-soft); }
+.cv-tag { background: var(--lilac-soft); color: var(--plum); font-weight: 600; padding: 2px 9px; border-radius: 999px; font-size: 11px; }
+.cv-code { font-family: var(--font-mono); color: var(--ink-soft); font-size: 11px; }
+.cv-pay { color: var(--gold); font-weight: 600; }
+.cv-customer { font-style: italic; }
+.cv-ticket-del { background: transparent; border: none; color: var(--ink-soft); cursor: pointer; padding: 8px; border-radius: 8px; display: flex; }
+.cv-ticket-del:hover { background: var(--iris-soft); color: var(--iris); }
+
+.cv-modal-overlay { position: fixed; inset: 0; background: rgba(43,35,51,.45); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 50; }
+.cv-modal { background: var(--cream); border-radius: 18px; padding: 22px; width: 100%; max-width: 440px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 20px 50px rgba(43,35,51,.28); max-height: 90vh; overflow-y: auto; }
+.cv-modal-head { display: flex; align-items: center; justify-content: space-between; }
+.cv-modal-head h3 { font-family: var(--font-display); font-size: 20px; margin: 0; color: var(--plum); }
+.cv-icon-btn { background: transparent; border: none; color: var(--ink-soft); cursor: pointer; padding: 4px; display: flex; }
+.cv-icon-btn:hover { color: var(--ink); }
+
+.cv-field { display: flex; flex-direction: column; gap: 5px; flex: 1; font-size: 12.5px; color: var(--ink-soft); font-weight: 600; position: relative; }
+.cv-field input, .cv-field select { font-family: var(--font-body); font-size: 14px; color: var(--ink); background: var(--card); border: 1px solid var(--grid); border-radius: 9px; padding: 9px 11px; width: 100%; }
+.cv-field input:focus, .cv-field select:focus { outline: 2px solid var(--iris); outline-offset: 1px; }
+.cv-field-row { display: flex; gap: 10px; }
+.cv-picked-hint { font-size: 11px; color: var(--iris-dark); font-weight: 500; }
+
+.cv-picker { position: relative; }
+.cv-picker-input { display: flex; align-items: center; gap: 7px; background: var(--card); border: 1px solid var(--grid); border-radius: 9px; padding: 0 11px; }
+.cv-picker-input:focus-within { outline: 2px solid var(--iris); outline-offset: 1px; }
+.cv-picker-icon { color: var(--ink-soft); flex-shrink: 0; display: flex; }
+.cv-picker-input input { border: none !important; padding: 9px 0 !important; flex: 1; min-width: 0; background: transparent; }
+.cv-picker-input input:focus { outline: none !important; }
+.cv-picker-dropdown { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: var(--card); border: 1px solid var(--grid); border-radius: 12px; box-shadow: 0 12px 28px rgba(43,35,51,.16); max-height: 240px; overflow-y: auto; z-index: 10; padding: 6px; display: none; }
+.cv-picker-dropdown.open { display: block; }
+.cv-picker-empty { padding: 12px 10px; font-size: 12.5px; color: var(--ink-soft); line-height: 1.5; font-weight: 400; }
+.cv-picker-item { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px; background: transparent; border: none; text-align: left; padding: 8px 10px; border-radius: 8px; cursor: pointer; font-family: var(--font-body); }
+.cv-picker-item:hover { background: var(--iris-soft); }
+.cv-picker-name { font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cv-picker-meta { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.cv-picker-code { font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-soft); }
+.cv-picker-price { font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: var(--iris-dark); }
+
+.cv-modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }
+
+.cv-toast { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); background: var(--plum); color: #FBF7FE; padding: 10px 18px; border-radius: 999px; font-size: 13px; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,.2); z-index: 60; }
+.cv-toast-error { background: #8C3A3A; }
+
+.cv-footer-note { text-align: center; font-size: 11.5px; color: var(--ink-soft); margin-top: 30px; line-height: 1.6; }
+</style>
+</head>
+<body>
+<div id="app" class="cv-root"></div>
+<input type="file" id="importFileInput" accept="application/json" style="display:none">
+<script>
+const CATALOG_RAW = {"categories":["Buketi i aranžmani","Korpe i pakovanje","Kozmetika i parfimerija","Ostalo","Pokloni i suveniri","Rezano cveće","Sadnice i nega bilja","Sobne biljke","Suvo cveće i ikebane","Sveće","Ukrasi i trake","Vaze i saksije"],"products":[[1,"RUZA AKITO",132.0,5],[2,"RUZA RED BORLIN",200.0,5],[3,"RUZA TEMTEJSEN",540.0,5],[4,"RUZA EMERALDA",90.0,5],[5,"RUZA AMBASADOR",100.0,5],[6,"RUZA VENDELA",110.0,5],[7,"RUZA VIVALDI",120.0,5],[8,"RUZA WOW",130.0,5],[9,"RUZA SPINX",140.0,5],[10,"RUZA VENDELA BLU",150.0,5],[11,"RUZA LEANDRA",150.0,5],[12,"RUZA GRAND GALA",170.0,5],[13,"RUZA PARIS",180.0,5],[14,"RUZA AQUA",200.0,5],[15,"RUZA AMSTERDAM",250.0,5],[16,"RUZA CARRERA",300.0,5],[17,"RUZA LENI",280.0,5],[18,"HRIZANTEMA",160.0,5],[19,"HRIZANTEMA KOLOR",150.0,5],[20,"OBICAN LJILJAN",350.0,5],[21,"ORJENTAL LJILJAN",580.0,5],[22,"ORJENTAL EKSTRA",390.0,5],[23,"KALE",350.0,5],[24,"RAJ. PTICA GERBER",600.0,5],[25,"GERBER",150.0,5],[26,"ANTURIJUM",1104.0,7],[27,"BAMBUS SPIRALIS",550.0,7],[28,"BAMBUS",250.0,7],[29,"KARANFIL",48.0,5],[30,"BUKET DUO",100.0,0],[31,"BUKET DUO MIX",150.0,0],[32,"BUKET MIX",180.0,0],[33,"BUKET GATRDEN",200.0,0],[34,"BUKET GARDEN LL",250.0,0],[35,"BUKET APEL",4500.0,0],[36,"BUKET BIRD",300.0,0],[37,"BUKET SANY",320.0,0],[38,"BUKET LJILJANA",350.0,5],[39,"BUKET RUZA",380.0,5],[40,"BUKET MANGO",420.0,0],[41,"BUKET TUTI FRUTI",450.0,0],[42,"BUKET KARIBA",490.0,0],[43,"BUKET KOPAGANA",520.0,0],[44,"BUKET IRIS",540.0,0],[45,"BUKET GRETA",570.0,0],[46,"BUKET FILADELFIJA",590.0,0],[47,"BUKET DIGIREIN",630.0,0],[48,"BUKET LJUBICICA",640.0,0],[49,"BUKET RIO RITA",660.0,0],[50,"BUKET BLU SONG",680.0,0],[51,"BUKET MAGNOLIJA",720.0,0],[52,"BUKET ORHIDEJA",740.0,7],[53,"BUKET LA-LA-LA",780.0,0],[54,"BUKET TVISTER",250.0,0],[55,"BUKET BANANA",810.0,0],[56,"BUKET IVA",830.0,0],[57,"BUKET 0845",550.0,0],[58,"BUKET 0850",850.0,0],[59,"BUKET 0865",860.0,0],[60,"BUKET 0870",2000.0,0],[61,"BUKET 0885",880.0,0],[62,"BUKET 0895",890.0,0],[63,"BUKET 0900",900.0,0],[64,"BUKET 0920",920.0,0],[65,"BUKET 0925",930.0,0],[66,"BUKET 0930",940.0,0],[67,"BUKET 0945",950.0,0],[68,"BUKET 0950",960.0,0],[69,"BUKET 0960",970.0,0],[70,"BUKET 0965",980.0,0],[71,"BUKET 0975",1000.0,0],[72,"BUKET 0980",1150.0,0],[73,"BUKET 0985",1200.0,0],[74,"BUKET MAGIC LL",1300.0,0],[75,"BUKET MAGIC",1400.0,0],[76,"PARFEM J.S.P.",1170.0,2],[77,"KREMA FERARI",1375.0,2],[78,"PARFEM LAGERFELD",2550.0,2],[79,"PARFEM PARADOX",1750.0,2],[80,"PARFEM JACOMO",2055.0,2],[81,"PARFEM KARTIJER",480.0,2],[82,"PARFEM BURBERRY",430.0,2],[83,"PARFEM TRICIJA",475.0,2],[84,"PARFEM OPIUM",420.0,2],[85,"PARFEM JUST MUSK",515.0,2],[86,"PARFEM TIME BOMB",705.0,2],[87,"LOS. IS. ROSSELINI",805.0,2],[88,"PARFEM NOW",255.0,2],[89,"PARFEM FURY",225.0,2],[90,"PARFEM SIRENA",230.0,2],[91,"PARFEM KINDLE",215.0,2],[92,"PARFEM REPUBLIKA",210.0,2],[93,"PARFEM AQUA VITA",205.0,2],[94,"PARFEM BALERINA",190.0,2],[95,"PARFEM LOV GARDEN",195.0,2],[96,"DEZODORANS DIAVOLO",265.0,2],[97,"DEZODORANS A.B.",430.0,2],[98,"KOMPLET V.VAN GOGH",590.0,0],[99,"KOMPLET NIVEA",1000.0,0],[100,"KOMP. ZA KUP.AROMA",150.0,2],[101,"KOMP. NEUTRO ROB.",940.0,2],[102,"KOMP. BLACK LABEL",390.0,2],[103,"NIVEA POSLE BRIJ.",410.0,2],[104,"EVONIMUS",555.0,7],[105,"INT. KR. ANTI AGE",235.0,2],[106,"ADIDAS AFTER SHAVE",375.0,2],[107,"DEZODORANS AXE",649.0,2],[108,"DEZODORANS ADIDAS",290.0,2],[109,"PARFEM C-THRU",250.0,2],[110,"DEZODORANS NIVEA",200.0,2],[111,"AFTER SEI MACSHO",457.0,3],[112,"NIVEA PENA ZA KOSU",225.0,2],[113,"PENA ZA KOSU STYL.",275.0,2],[114,"KOM.NIVEA DUSCH-OL",535.0,2],[115,"KOMPLET ШBU",705.0,0],[116,"PARFEM ШBU",680.0,2],[117,"PARF.EAU DE TOILET",775.0,2],[118,"PARF.NATURAL SPRAY",465.0,2],[119,"DEZODORANS B.U.",225.0,2],[120,"MLEKO ZA TELO B.U.",225.0,2],[121,"B.U.LOSION",335.0,2],[122,"NIVEA KUPKA",255.0,2],[123,"KUPKA NIVEA BATHC",280.0,2],[124,"ML. ZA TELO NIVEA",345.0,2],[125,"KOMP.NOIVEA VISAGE",650.0,2],[126,"KOMP.NIVEA SH.CON.",855.0,2],[127,"DEZ. NIVEA BALANCE",215.0,2],[128,"KUPKA NIVEA PFL.",165.0,2],[129,"NIVEA BODY LOTION",285.0,2],[130,"NIV. BODY Q10 PLUS",365.0,2],[131,"KOMPLET SPORTSTAR",275.0,0],[132,"KOMPLET CLIVEN",435.0,0],[133,"KUPKA CLIVEN",1020.0,2],[134,"KUPKA F.AZZ. BAGNO",625.0,2],[135,"KUPKA F.AZ. DOCCIA",535.0,2],[136,"KUPKA F.AZ. NATURA",125.0,2],[137,"DEZ. FELCE AZZURRA",185.0,2],[138,"PARFEM CUBA",775.0,2],[139,"ML. ZA TELO OLANA",225.0,2],[140,"KUPKA GENERA",1385.0,2],[141,"KREME",569.0,2],[142,"KREMA CLIVEN",205.0,2],[143,"DEZODORANS FA",145.0,2],[144,"DEZODORANS CUBA",240.0,2],[145,"KOMPLET STENA",570.0,0],[146,"DEZODORANS DOVE",195.0,2],[147,"DOVE ANTI PERSP.",215.0,4],[148,"BODI MILK DOVE",295.0,4],[149,"DOVE SHOWER CARE",225.0,4],[150,"DOVE CREAM OIL SH.",235.0,4],[151,"DOVE BODY LOTION",270.0,4],[152,"DOVE SHAMPOO",185.0,4],[153,"DOVE MOIST.M.SAM.",175.0,4],[154,"DEZ.NEUTRO ROBERTS",175.0,2],[155,"PENA ZA KOSU GENER",125.0,2],[156,"DEZ.DIAV.PER DONNA",280.0,2],[157,"N.ROBERT AFTER SH.",335.0,2],[158,"PENA ZA BR.GILETE1",295.0,2],[159,"PENA ZA BR.GILETE2",230.0,2],[160,"AFTER SHШFA  MAGIC",340.0,2],[161,"KOMPLET ШINTESA",765.0,0],[162,"KOMPLET ШSTR8",895.0,0],[163,"KOMPLET V.VAN GOGH",855.0,0],[164,"KOMPLET ШPAGAN",970.0,0],[165,"KOMPLET ШDAISY",595.0,0],[166,"KOMP. ШBET. BURTY",755.0,3],[167,"KUTIJA ZA RUZU",380.0,1],[168,"FONTANA",1950.0,4],[169,"IKEBANA S.CV.U KOR",550.0,8],[170,"IKEBANA VEST.CVECE",370.0,8],[171,"IKEB. VECA S.CVECE",980.0,0],[172,"IK.MANJA S.CV.DZAK",680.0,8],[173,"SUVO CVECE U KOK.",105.0,8],[174,"S.CV.U KOR.SA LAUF",860.0,8],[175,"IKEBANA SA SUNCOK.",1215.0,8],[176,"VEST.CVECE U CUPU",35.0,4],[177,"SUVI BUKET",460.0,0],[178,"BUKET SUV SA SUNC.",445.0,0],[179,"S.CV.U KERAM.KORPI",1250.0,8],[180,"S.BUKET NA STUBAMA",650.0,0],[181,"SUVI ARANZMAN L",690.0,0],[182,"SUVI ARANZMAN LL",470.0,0],[183,"SUVI ARANZMAN LLL",750.0,0],[184,"SAKS.SA RUZ. SUVIM",310.0,8],[185,"ZIMNICA U FLASAMA",310.0,6],[186,"PRASE KASICA",210.0,4],[187,"VAZNA SREBR. MANJA",425.0,11],[188,"VAZNA ZELENA",325.0,11],[189,"VAZNA MANJA ZELENA",670.0,11],[190,"VAZNA STAKLENA",980.0,11],[191,"KORPA",65.0,1],[192,"KORPA ZA PICE",220.0,1],[193,"MACKA KERAMICKA",310.0,4],[194,"MACKA OD DRVETA",500.0,4],[195,"POSLUZ. ZA KREVET",350.0,4],[196,"VAZNA VECA SREBRNA",245.0,11],[197,"VAZNA KREM",490.0,11],[198,"KUT. ZA KLJ.M.BELA",580.0,4],[199,"KUT. ZA KLJ. PLAVA",480.0,4],[200,"SOLJE I CAJNIK",145.0,4],[201,"BOKAL SA SOLJ.KIN.",425.0,4],[202,"VAZNA VECA STAKL.",1740.0,11],[203,"DRV. KUTIJE MANJE",265.0,4],[204,"RAM ZA SLIKE L",340.0,4],[205,"RAM ZA SLIKE LL",355.0,4],[206,"RAM ZA SLIKE LLL",450.0,4],[207,"RAM ZA SLIKE LV",185.0,4],[208,"SAKSIJE SA KANAPOM",496.0,11],[209,"VAZA ROZA",490.0,11],[210,"SAKSIJE KER.ZELENE",490.0,11],[211,"KER. SAKSIJA SIVA",590.0,11],[212,"KUTIJA DRVENA VECA",355.0,1],[213,"VAZA OD MANGA VECA",435.0,11],[214,"VAZA OD MAN.SAR.M.",685.0,11],[215,"CUP OD MANGA",210.0,4],[216,"PIKSLA OD DRVETA",320.0,4],[217,"SVESKE OD PAPIRUSA",230.0,4],[218,"KERAM. CUP MANJI",320.0,4],[219,"SAKS. KERAM. CETV.",650.0,4],[220,"VAZA PLAVA VECA",305.0,11],[221,"VAZA PLAVA MANJA",180.0,11],[222,"NOTESI VECI",105.0,4],[223,"IMENIK",80.0,4],[224,"NOTESI MANJI",80.0,4],[225,"KER.POS.U OBL.SRCA",270.0,4],[226,"SAKS.KER.CETV.LAK.",550.0,4],[227,"SAKSIJE BELE MANJE",700.0,11],[228,"SAKSIJE REBR.BELE",890.0,11],[229,"SAKS.BELE-PRUGE",130.0,3],[230,"POSLUZ. DRV-PODM.",860.0,4],[231,"KUTIJA SESTOUGAO",320.0,1],[232,"KUTIJA KOCKASTA",260.0,1],[233,"DRVENA ZABA",465.0,3],[234,"KUTIJA TROUGLASTA",280.0,1],[235,"SAT DRVENI",855.0,4],[236,"ALBUK KOFER",1100.0,4],[237,"ADRESAR-OLOVKA",410.0,4],[238,"ALBUM SA PLOИOM",640.0,4],[239,"CUP SA DRSKAMA",440.0,4],[240,"CUP VECI-SARE",410.0,4],[241,"CUP MANJI-CVECE",360.0,4],[242,"TANJIR SA STAKLOM",420.0,4],[243,"VAZNA SA TUFNAMA",310.0,11],[244,"VAZA STAKLENA M.U",345.0,11],[245,"VAZA ST.PRAVOUGAO",495.0,11],[246,"SAKSIJE SA SARGAR",380.0,11],[247,"SAKSIJE ZLATNE B.",360.0,11],[248,"SAKSIJE ZELENE M.",240.0,11],[249,"SAKSIJE U.PR.BELE",355.0,11],[250,"SAKSIJE ROZE VECE",3900.0,11],[251,"SAKSIJE ZLATNE PR",1890.0,11],[252,"SAKSIJA SIVA LEZ.",530.0,11],[253,"FLASICA STAKLENA",100.0,4],[254,"VAZNA OD MESINGA",540.0,11],[255,"VAZNA ST.M.PRAV.",265.0,11],[256,"VAZNA I POSTOLJE",210.0,11],[257,"TAM-TAM",985.0,4],[258,"MASKE",450.0,4],[259,"PTICE-BAMBUS-VR.",535.0,7],[260,"ИINIJA ZABA",380.0,4],[261,"KORPICA",10.0,1],[262,"KORPA",180.0,1],[263,"SVECE U GRANULAMA",70.0,9],[264,"SVECA U KUTIJI",95.0,9],[265,"SVECA-LALE",350.0,9],[266,"SVECA KOCKA",485.0,9],[267,"SVECA U KOFI",635.0,9],[268,"SVECA-ИASI SA RUZ",330.0,9],[269,"SVECA U ИASI",60.0,9],[270,"SVECA SA KANAPOM",395.0,9],[271,"SVECA ZELENA",40.0,9],[272,"SVECA U TEGLI",170.0,9],[273,"KOMP.SVECA-ИASA",150.0,9],[274,"KOMPLET SVECA",210.0,0],[275,"SVECE U ST.CVETU",120.0,9],[276,"M.MIRISLJ. SVECE",15.0,9],[277,"SVECNJAK K.GVOZDJE",380.0,9],[278,"SVECNJ.V.K.GVOZDJE",1500.0,9],[279,"SVECNJACI PLAVI",170.0,9],[280,"SVECNJ.-TRI ИASE",395.0,9],[281,"SVECNJAK-MOST",580.0,9],[282,"SVECNJAK-DVE ИASE",420.0,9],[283,"RIBA ST.ZA SVECE",185.0,9],[284,"MESEC ST.ZA SVECE",155.0,9],[285,"ИETVRT. SVECNJAK",185.0,9],[286,"CINIJE ZA SVECU 1",235.0,3],[287,"CINIJE ZA SVECU 2",250.0,3],[288,"SVECE KRIVE",145.0,9],[289,"SVECE KR.MANDAR.",50.0,9],[290,"SVECE POMORANDZE",110.0,9],[291,"LIMUN SVECE",110.0,9],[292,"SVECA GROZDJE",115.0,9],[293,"SVECA MAK",105.0,9],[294,"KORPA OD ROSVAJA",250.0,1],[295,"PICE BOLS",850.0,4],[296,"TEK. TWO FINGERS",1195.0,4],[297,"VINO SMEDEREVKA",176.0,4],[298,"MARTINI",1190.0,4],[299,"KINESKI  CUP",810.0,4],[300,"ZELENA VAZA-LIMUN",160.0,11],[301,"ROZE SVECE VECE",20.0,9],[302,"UVIJENE SVECE M.",30.0,9],[303,"UKR.SVECE UV.PL.",35.0,9],[304,"U.SVECE N.PL.1/10",130.0,9],[305,"UKR.SV.CANDLES1/4",650.0,9],[306,"KER.SAKSIJE OKR.V",610.0,11],[307,"V.PL.KER.SAKSIJE",790.0,11],[308,"LUFA",8160.0,4],[309,"LUFA ZELENA",75.0,4],[310,"CUP BRAON PLETENI",760.0,4],[311,"SUVO CVECE SV.BR.",45.0,8],[312,"SUVO CVECE T. BR.",40.0,8],[313,"SUV BAMBUSOV ORAH",410.0,7],[314,"S.BOBIИ.CVECE Z.B",60.0,3],[315,"S.CVECE-ИASICA",50.0,0],[316,"DRVENO SRCE",20.0,3],[317,"SUVE RUZE",45.0,8],[318,"KOMPL. SUVO CVECE",150.0,8],[319,"SUVA METLICA",70.0,3],[320,"SUVO CVECE-SESIR",770.0,8],[321,"SUVE SISARKE",35.0,8],[322,"SUVI SNOPИICI",30.0,8],[323,"SUVE PEИURKE",15.0,8],[324,"SUVI LISTICI BELI",20.0,8],[325,"SUVI LISTICI ZUTI",10.0,8],[326,"S. STAPICI BAMBUS",45.0,7],[327,"LJUBIИ.PALMA SUVA",80.0,7],[328,"PROTEA SUVA",160.0,5],[329,"SUVI PLAVI CVETICI",25.0,8],[330,"UKRASNA LAM.",985.0,10],[331,"SPAT.SOPHEN",840.0,7],[332,"VRESIJAH",760.0,7],[333,"DRAC. HED",3800.0,7],[334,"SAFLERAH",860.0,8],[335,"ПЛ.CAKC. 015",15.0,11],[336,"ЋУП 1100H",1100.0,4],[337,"BAЗHA 0525",580.0,4],[338,"PУЖA 0160",130.0,4],[339,"PУЖA 0150",220.0,4],[340,"S.CVETI CI-BOB.C.",55.0,3],[341,"SUVI SUNCOKRET",65.0,8],[342,"S.PLETENO DRVECE",35.0,8],[343,"S. VRCKAVO CVECE",420.0,8],[344,"KESE ZA PICE VECE",125.0,1],[345,"KESE ZA POKLONE",60.0,1],[346,"KOVERTE",20.0,1],[347,"PORUKE",10.0,10],[348,"TRAVA SEME",650.0,6],[349,"PL.ZARDINJERE 40",105.0,11],[350,"PL.ZARDINJERE 32",85.0,11],[351,"PL.ZARDINJERE 20",140.0,11],[352,"PL.SAKSIJE KOC.26",85.0,11],[353,"PL.SAKSIJE KOC.23",65.0,11],[354,"PL.SAKSIJE OKR.17",70.0,11],[355,"PL.SAKSIJE OKR.21",85.0,11],[356,"PL.SAKSIJE OKR.24",80.0,11],[357,"PL.SAKSIJE OKR.25",185.0,11],[358,"PL.SAKSIJE OKR.30",130.0,11],[359,"PL.SAKSIJE OKR.15",34.0,11],[360,"PL.SAKSIJE OKR.14",230.0,11],[361,"PL.SAKSIJE OKR.13",45.0,11],[362,"PL.SAKSIJE OKR.18",28.0,11],[363,"PL.SAKS.OKR.22,7L",390.0,3],[364,"PL.SAKSIJE OKR.25",390.0,11],[365,"PL.SAKSIJE OKR.39",185.0,11],[366,"PRIHR. CVECE 0125",220.0,6],[367,"PRIHR. CVECE 0110",280.0,6],[368,"PRIHR. CVECE 0140",580.0,6],[369,"PRIHR. CVECE 0190",380.0,6],[370,"KORPA PLETENA0290",290.0,1],[371,"KORPA PLETENA0310",310.0,1],[372,"KORPA PLETENA0520",520.0,1],[373,"KORPA PLETENA0275",275.0,1],[374,"KORPA PLETENA0485",1200.0,1],[375,"KORPE PLET. 050",500.0,1],[376,"KORPE PLET. 070",450.0,1],[377,"KORPE PLET. 090",700.0,1],[378,"KORPE PLET. 0120",580.0,1],[379,"KORPE PLET. 0155",900.0,1],[380,"KORPE PLET. 0185",1200.0,1],[381,"KORPE PLET. 0230",230.0,1],[382,"STAPOVI-BAMBUS100",235.0,7],[383,"STAPOVI-BAMBUS060",90.0,7],[384,"STAPOVI-BAMBUS180",460.0,7],[385,"STAPOVI-BAMBUS260",290.0,7],[386,"KORPA 0200",200.0,1],[387,"KORPA 0220",280.0,1],[388,"KORPA 0170",170.0,1],[389,"KORPA 0250",250.0,1],[390,"KORPA 0320",300.0,1],[391,"KORPA 0235",340.0,1],[392,"KORPA 0450",320.0,1],[393,"KORPA 0775",450.0,1],[394,"GRABULJA 0540",540.0,3],[395,"TORBA 0155",300.0,1],[396,"ASURA 0650",650.0,3],[397,"KORPA 0270",270.0,1],[398,"KORPA 0240",240.0,1],[399,"KORPA 0180",180.0,1],[400,"LUKOVICE LALE0380",20.0,6],[401,"LUKOV.NARCIS 0320",100.0,5],[402,"LUKOVICE KROK0290",95.0,6],[403,"LUKOVICE 0280",350.0,6],[404,"LUKOVICE 0240",165.0,6],[405,"LUKOVICE 0250",255.0,6],[406,"LUKOVICE 0180",195.0,6],[407,"LUKOVICE 0210",190.0,6],[408,"LUKOVICE 0190",270.0,6],[409,"LUKOVICE 0400",255.0,6],[410,"LUKOVICE 0150",170.0,6],[411,"LUKOVICE 0360",450.0,6],[412,"LUKOVICE 0140",200.0,6],[413,"LUKOVICE 0690",130.0,6],[414,"LUKOVICE-KUT.0930",150.0,6],[415,"SEME VECE 055",35.0,3],[416,"SEME MANJE 035",70.0,3],[417,"ZEMLJA 0,5L 035",85.0,6],[418,"ZEMLJA 10L 060",160.0,6],[419,"ZEMLJA 25L 0160",350.0,6],[420,"ZEMLJA 50L 0310",580.0,6],[421,"ARALIJA 0790",890.0,3],[422,"KORPA 0430",440.0,1],[423,"KORPA 0360",360.0,1],[424,"DIZGOTEJA 0280",840.0,3],[425,"JUKA 0510",1250.0,7],[426,"KROTEN 0340",880.0,3],[427,"KROTEN 0390",590.0,3],[428,"DRACENA 0815",390.0,7],[429,"KAKTUS 0360",620.0,7],[430,"PALMA 0230",590.0,7],[431,"FIKUS 0190",4200.0,7],[432,"BENDZAMIN 0465",540.0,7],[433,"BENDZAMIN 0495",495.0,7],[434,"FIKUS 0320",680.0,7],[435,"KALATEA 0440",1280.0,7],[436,"KALATEA 0490",980.0,7],[437,"SPATIFILUM 0750",840.0,3],[438,"KROTON 0350",980.0,7],[439,"PALMA 0180",1800.0,7],[440,"SAFLERA 0450",4200.0,3],[441,"BENDZAMIN 0590",9899.0,7],[442,"DRACENA 0240",590.0,7],[443,"KROTON 0760",1100.0,7],[444,"GUZMALIJA 0980",1380.0,3],[445,"FILADENDRON 0780",1260.0,3],[446,"LOZA 0840",1880.0,3],[447,"CIKAS PALMA 0720",2200.0,7],[448,"KORDILINA 0470",620.0,3],[449,"GARDENIJA 0690",960.0,3],[450,"NOLINA 0530",700.0,7],[451,"ALOKASIJA 0420",790.0,3],[452,"SAFLERA 0430",480.0,3],[453,"CIKAS PALMA 1620",1500.0,7],[454,"DIFENBAHIJA 0480",864.0,7],[455,"STROMANTA 0385",3100.0,3],[456,"SINGONIJUM 0250",690.0,3],[457,"ASPLENIJUM 0220",620.0,3],[458,"KESTEN 0570",1560.0,3],[459,"DIFENBAHIJA 0270",1890.0,7],[460,"VISINGTONIJA 1900",1900.0,3],[461,"DRACENA 0160",640.0,7],[462,"BENDZAMIN 0810",850.0,7],[463,"KALATEA 0310",790.0,7],[464,"LJUBIИICA 0170",380.0,3],[465,"DIFENBAHIJA 0275",620.0,7],[466,"HRISTOS VENAC0545",420.0,3],[467,"DRACENA 2100",1450.0,7],[468,"DRACENA 2160",4600.0,7],[469,"JELKA 0990",2400.0,3],[470,"SINGONIUM 1070",1250.0,3],[471,"KAKTUS 0620",480.0,7],[472,"DRACENA 1430",1750.0,7],[473,"PALMA 0580",1310.0,7],[474,"STROMANTA 1100",2280.0,3],[475,"PALMA 1970",4350.0,7],[476,"KALATEA 0680",980.0,7],[477,"SAFLERA 0520",690.0,3],[478,"FIKUS 0630",660.0,7],[479,"KALATEA 0460",320.0,7],[480,"DRACENA 0860",720.0,7],[481,"JUKA 0880",1350.0,7],[482,"KAKTUS 1950",940.0,7],[483,"LIOLING 2680",6600.0,3],[484,"PALMA 0790",790.0,7],[485,"JUKA 3630",3900.0,7],[486,"NOLINA 8950",1820.0,7],[487,"KELICIJA 2950",15200.0,3],[488,"ARALIJA 4700",980.0,3],[489,"ZAMIJA 4780",1980.0,3],[490,"VASINGTONIJA 3250",6900.0,3],[491,"DRACENA 4760",380.0,7],[492,"SUVO CVECE 1",180.0,8],[493,"SUVO CVECE 2",150.0,8],[494,"UKRAS A",180.0,10],[495,"UKRAS B",50.0,10],[496,"GUZMANIJA A.",1240.0,3],[497,"DIFENBAHIJA T.",890.0,7],[498,"ZUMBUL",150.0,5],[499,"CAMELIJA J.",980.0,3],[500,"STROMANTA 1360",2170.0,3],[501,"CIKAS PALMA 4700",6800.0,7],[502,"BENDZAMIN 1200",2980.0,7],[503,"HIBISKUS 0290",680.0,3],[504,"SOLANUM 0410",440.0,3],[505,"GLOKASINIJA 0260",250.0,3],[506,"JUKA 1260",4800.0,7],[507,"RUZA 0210",300.0,5],[508,"BAMBUS 0635",1760.0,7],[509,"KESE ZA POKLON050",145.0,1],[510,"KLIVIJA 0950",1970.0,3],[511,"KAKTUS 0120",480.0,7],[512,"KALANHOA 0200",380.0,3],[513,"MARGARETE 0150",240.0,3],[514,"MARGARETE 0890",480.0,3],[515,"DRVENA SAKS.0720",720.0,3],[516,"PAPIRI 005",50.0,3],[517,"PAPIRI 010",10.0,3],[518,"UKR.PAPIR 015",30.0,1],[519,"UKR.PAPIR 035",40.0,1],[520,"UKR.PAPIR 045",50.0,1],[521,"UKR.PAPIR 050",100.0,1],[522,"MREZICA 060",100.0,3],[523,"MREZICA 025",120.0,3],[524,"UKR.TRAKA 090",20.0,10],[525,"UKR.TRAKA 010",30.0,10],[526,"UKR.TRAKA 025",40.0,10],[527,"UKR.TRAKA 015",50.0,10],[528,"UKR.TRAKA 020",70.0,10],[529,"UKR.TRAKA 030",100.0,10],[530,"UKR.TRAKA 035",35.0,10],[531,"UKR.TRAKA 075",75.0,10],[532,"UKR.PAPIR 030",195.0,1],[533,"KREP PAPIR 040",40.0,3],[534,"MASNA 005",10.0,10],[535,"MASNA 010",20.0,10],[536,"MASNA 015",30.0,10],[537,"MASNA 020",40.0,10],[538,"MASNA 030",50.0,10],[539,"MASNA 035",60.0,10],[540,"MASNA 040",70.0,10],[541,"MASNA 050",80.0,10],[542,"MASNA 060",90.0,10],[543,"MASNA 070",200.0,10],[544,"MASNA 080",80.0,10],[545,"MASNA 085",85.0,10],[546,"MASNA 090",90.0,10],[547,"MASNA 100",100.0,10],[548,"KORA OD BANANE040",40.0,3],[549,"SUVO CVECE MAH080",560.0,8],[550,"KESE ZA CVECE 020",300.0,1],[551,"PL. SAKSIJA 40",6900.0,11],[552,"OPJEHTAЛ A350",60.0,3],[553,"ИЛEKC .450",780.0,3],[554,"PAM 0610",610.0,3],[555,"PAM 0090",90.0,3],[556,"PAM 0075",50.0,3],[557,"SVECA 0025",30.0,9],[558,"SVECA 0035",40.0,9],[559,"SVECA 0080",50.0,9],[560,"SVECA 0065",2.0,9],[561,"SVECA 0045",5.0,9],[562,"BUKET 0110",110.0,0],[563,"BUKET 0120",120.0,0],[564,"BUKET 0130",130.0,0],[565,"BUKET 0140",140.0,0],[566,"BUKET 0160",160.0,0],[567,"BUKET 0170",170.0,0],[568,"BUKET 0190",190.0,0],[569,"BUKET 0210",210.0,0],[570,"BUKET 0220",220.0,0],[571,"BUKET 0230",230.0,0],[572,"BUKET 0240",240.0,0],[573,"BUKET 0260",260.0,0],[574,"BUKET 0270",270.0,0],[575,"BUKET 0290",290.0,0],[576,"BUKET 0310",310.0,0],[577,"BUKET 0330",330.0,0],[578,"BUKET 0340",340.0,0],[579,"BUKET 0360",360.0,0],[580,"BUKET 0370",580.0,0],[581,"BUKET 0390",390.0,0],[582,"BUKET 0400",400.0,0],[583,"BUKET 0410",280.0,0],[584,"BUKET 0430",430.0,0],[585,"BUKET 0440",440.0,0],[586,"BUKET 0460",460.0,0],[587,"BUKET 0470",470.0,0],[588,"BUKET 0480",480.0,0],[589,"BUKET 0500",500.0,0],[590,"BUKET 0510",510.0,0],[591,"BUKET 0530",530.0,0],[592,"BUKET 0550",550.0,0],[593,"BUKET 0560",560.0,0],[594,"BUKET0580",580.0,0],[595,"BUKET 0600",600.0,0],[596,"BUKET 0610",610.0,0],[597,"BUKET 0620",620.0,0],[598,"BUKET 0670",670.0,0],[599,"BUKET 0690",690.0,0],[600,"BUKET 0700",700.0,0],[601,"BUKET 0710",710.0,0],[603,"BUKET 0750",750.0,0],[604,"BUKET 0760",760.0,0],[605,"BUKET 0770",770.0,0],[606,"BUKET 0800",800.0,0],[607,"BUKET 0820",820.0,0],[608,"BUKET 0910",910.0,0],[609,"BUKET 1100",1500.0,0],[610,"BUKET 1200",1630.0,0],[612,"BUKET 1400",2270.0,0],[613,"BUKET 1500",650.0,0],[614,"LUKOVICE 0160",35.0,6],[615,"LUKOVICE 0220",35.0,6],[616,"LUKOVICE 0120",35.0,6],[617,"YUCCA 0660",2550.0,3],[618,"OPUNIKA",1560.0,3],[619,"P.ZA CVECE 0190",235.0,3],[620,"P.ZA CVECE 0290",360.0,3],[621,"OGLEDALO 0210",210.0,4],[622,"TRAVA SEME 0180",230.0,6],[623,"UKRAS 0360",200.0,10],[624,"UKRAS 0745",300.0,10],[625,"ORHIDEJA 0180",1200.0,7],[626,"SAMPON 060",60.0,3],[628,"KUOKA 0310",310.0,3],[629,"DEO 0280",280.0,3],[630,"DEO 0105",105.0,3],[631,"DEO 0140",140.0,3],[632,"DEO 0170",170.0,3],[633,"DEO 0245",300.0,3],[634,"DEO 195",195.0,3],[635,"GEL 0270",270.0,3],[636,"STIK 070",75.0,3],[637,"STIK 0210",210.0,3],[638,"STIK 0235",235.0,3],[639,"PARFEM 0690",1480.0,2],[640,"PARFEM 0790",790.0,2],[641,"DEO 0255",255.0,3],[642,"KER.SAK. 0390",650.0,4],[643,"KER.SAKS. 0S40",350.0,4],[644,"KER.SAKS. 0265",490.0,4],[645,"P.ZA CVECE",195.0,3],[646,"RUZA SADNICA",180.0,5],[647,"SUNDJER",150.0,3],[648,"U.KORPA 0130",130.0,1],[649,"U.KORPA 0150",150.0,1],[650,"U.KORPA 0210",210.0,1],[651,"M.RUZA",420.0,5],[652,"CALCELARIJA",100.0,3],[654,"P.SAKSIJA 45",850.0,11],[655,"P.SAKSIJA 100",9550.0,11],[656,"P.SAKSIJA",580.0,11],[657,"P.SAKSIIA40",285.0,3],[658,"P.SAKSIJA 55",55.0,11],[659,"P.SAKSIJA 014",19.0,11],[660,"P.SAKSIJA 040",40.0,11],[661,"P.SAKSIJA 090",150.0,11],[662,"TRAVNA SMESA",220.0,3],[663,"P.SAKSIJA 0270",560.0,11],[664,"P.SAKSIJA 0170",750.0,11],[665,"P.SAKSIJA 0120",130.0,11],[666,"LUKOVICE 0010",12.0,6],[667,"LUKOVICE 0045",35.0,6],[668,"LUKOVICE 0050",60.0,6],[669,"LUKOVICE 0055",28.0,6],[670,"LUKOVICE 0060",60.0,6],[671,"LUKOVICE 0080",160.0,6],[672,"LUKOVICE 0090",60.0,6],[673,"LUKOVICE 0100",250.0,6],[674,"LUKOVICE 0120",18.0,6],[675,"CLEMATIS",560.0,3],[676,"PARTE.VEITCHI",960.0,3],[677,"PIERIS",1170.0,3],[678,"ERICA",250.0,3],[679,"CV.ARANZMAN 1",2500.0,0],[680,"CV.ARANZMAN 2",900.0,0],[681,"CV.ARANZMAN 3",580.0,0],[682,"CV.ARANZMAN 4",500.0,0],[685,"PARFEM 02",30.0,2],[686,"YUCCA 0660",1180.0,3],[687,"RODODENDRON",2300.0,3],[688,"VEST.BILJKA 01",100.0,7],[689,"VEST.BILJKA 02",250.0,7],[690,"VEST.BILJKA 03",200.0,7],[691,"VESS.BILJKA 04",50.0,7],[692,"SUVI ARANZMAN",2510.0,0],[693,"CACTUS 01",530.0,7],[694,"CACTUS 02",250.0,7],[695,"DRZAC ZAR.",100.0,4],[696,"BROMELA",680.0,3],[697,"CACTUS",480.0,7],[698,"ANTURIJUM",1560.0,7],[699,"ANTURIJUM A",890.0,7],[700,"DIFENBAHIJA",1890.0,7],[701,"NEFROLEPSIS",750.0,3],[702,"BONSAI",3380.0,3],[703,"UKRAS.O.",750.0,10],[704,"UKRAS.A.",890.0,10],[705,"UKRAS.I.",1190.0,10],[706,"UKRAS.V.",890.0,10],[707,"TORBA",400.0,1],[708,"SINGONIJUM",2540.0,3],[709,"UKRAS A",400.0,10],[710,"UKRAS B",550.0,10],[711,"UKRAS C",220.0,10],[712,"SAKSIJA K.",390.0,11],[713,"SAKSIJA V.",7900.0,11],[714,"SAKSIJA A.",1800.0,11],[715,"SAPHLERA",650.0,3],[716,"FONTANA 1",4600.0,4],[717,"FONTANA 2",2150.0,4],[718,"CICAS",3800.0,3],[719,"SHAMAROPS",9400.0,3],[720,"LACKY B.",1370.0,3],[721,"AEHMEJA",1960.0,3],[722,"ASPARAGUS",360.0,3],[723,"FICUS BELISE",760.0,7],[724,"FICUS ROBUST",3600.0,7],[725,"KORDILINA K.",890.0,3],[726,"PAHIRA A.",1490.0,3],[727,"TSILANDIJA",980.0,3],[728,"KROTON EX.",1560.0,7],[729,"CHAMADOREA",590.0,3],[730,"CALLATEA",1980.0,3],[731,"ARRECA",380.0,3],[732,"BENDJAMIN S.",3650.0,3],[733,"PAHIRA O.",12000.0,3],[734,"BANANA MUSA",490.0,3],[735,"LOZICA",450.0,3],[736,"LOZICA A.",120.0,3],[737,"SUKULENTA",100.0,7],[738,"CACTUS",1190.0,7],[739,"ACUBA J.",1250.0,3],[740,"CALLATEA M.",350.0,3],[741,"MARANTA",680.0,3],[742,"BROMELLA",980.0,3],[743,"DRACENA",1260.0,7],[744,"CHAMADOREA",390.0,3],[745,"DRACENA I.",1800.0,7],[746,"DISCOTEA",580.0,3],[747,"SPATIPHILUM S.",790.0,7],[748,"SPATIPHILUM M.",980.0,7],[749,"SPATIPHILUM P.",680.0,7],[750,"SPATIPHILUM W.",560.0,7],[751,"SINGONIJUM",660.0,3],[752,"BENDZAMIN O.",7900.0,7],[753,"BENDZAMIN A.",960.0,7],[754,"BENDZAMIN R.",980.0,7],[755,"BENDZAMIN B.",420.0,7],[756,"CROTON",490.0,3],[757,"GARDENIJA",690.0,3],[758,"FICUS R.",1850.0,7],[759,"CAPHLERA SJ",1840.0,3],[760,"ARECA",420.0,3],[761,"ANTURIJUM S.",1480.0,7],[762,"DISCOTEA",590.0,3],[763,"PUMILA",890.0,3],[764,"HEDERA",250.0,3],[765,"MARANTA S.",1880.0,3],[766,"PAHIRA AQUATICA",1950.0,3],[767,"DRACENA",770.0,7],[768,"NOLINA",700.0,7],[769,"KORDILINA",720.0,3],[770,"DRACENA M.",3700.0,7],[771,"ZAMIJA",1100.0,3],[772,"FICUS",1050.0,7],[773,"ALOKASIJA",1160.0,3],[774,"DIFENBAHIJA",680.0,7],[775,"AFELANDRA",890.0,3],[776,"EUFORBIJA",1150.0,3],[777,"HRIZANTEMA A",390.0,5],[778,"VAZNA",1450.0,11],[779,"VAZNA S.",280.0,11],[780,"SOLJE",50.0,4],[781,"SUVO CVECE",400.0,8],[782,"DRZAC B.",860.0,4],[783,"DRZAC Z.",80.0,4],[784,"UKRAS A",55.0,10],[785,"UKRAS S.",390.0,10],[786,"UKRAS*",120.0,10],[787,"UKRAS Z.",250.0,10],[788,"UKRAS SR",590.0,10],[789,"UKRAS C.",280.0,10],[790,"EUFORBIJA M.",450.0,3],[791,"HRIZANTEMA",200.0,5],[792,"ANTURIJUM R.",2580.0,7],[793,"NEORGELIJA",560.0,3],[794,"SALAGINELA",300.0,3],[795,"AZALEJA",760.0,7],[798,"PRIHRANA 0,2",280.0,3],[799,"PRIHRANA 0,5",390.0,3],[800,"PRIHRANA H.",470.0,3],[801,"KALATEA R.",1860.0,7],[802,"MARANTA",1450.0,3],[803,"UKR.SVECA",45.0,9],[804,"UKR.SLOVA",60.0,3],[805,"BALONI",8.0,3],[806,"STAPICI M.",320.0,3],[807,"STAPICI V.",85.0,3],[808,"DEKORACIJA",470.0,10],[809,"DEKORACIJA M.",45.0,10],[810,"U.SVECA",70.0,9],[811,"SUVA DEKORACIJA",520.0,10],[812,"SUVO CVECE",25.0,8],[813,"LJUBICICA",540.0,3],[814,"NOLINA",650.0,7],[815,"PEPEROMIJA",690.0,3],[816,"MUSEMA-U.FOLIJA",280.0,1],[817,"CREVO 25 M",2080.0,3],[818,"PRIK. ZA CREVO 1",185.0,3],[819,"PRIK. ZA CREVO 2",395.0,3],[820,"KOLUT ZA NAMOT.",2040.0,3],[821,"PARFEM P.",1090.0,2],[822,"GERBER M.",245.0,5],[823,"CALANHOJA M.",600.0,3],[824,"ANANAS",1930.0,3],[825,"COLUMNEA",1980.0,3],[826,"STRELIZZIA",2400.0,3],[827,"JASMIN",980.0,7],[828,"CRASULA",680.0,3],[829,"ZEMLJA B. 5/1",2400.0,6],[830,"ZEMLJA C. 10/1",90.0,6],[831,"ORHIDEJA BOX.",280.0,7],[832,"RAM ZA SLIKE",140.0,4],[833,"ERIKA",250.0,3],[834,"CH. FLECHERI",350.0,3],[835,"KASICA",450.0,3],[836,"KASICA S.",250.0,3],[837,"KASICA M.",230.0,3],[838,"UKRAS V.",1700.0,10],[839,"CH.FLECHERI",300.0,3],[840,"SALIX",1250.0,3],[841,"SALIX A.",1200.0,3],[842,"SALIX V.",1980.0,3],[843,"BUGUNVILEA",1850.0,3],[844,"MUSKATLA",150.0,7],[845,"ZEMLJA 1/80",13200.0,6],[846,"VES.DJUBR.",280.0,3],[847,"P.POSUDA",120.0,3],[848,"LACKY B.",980.0,3],[849,"ACHIANTUS",1200.0,3],[850,"CLEMATIS 1",780.0,3],[851,"CLEMATIS 2",800.0,3],[852,"RUZA STABLASICA",165.0,5],[853,"LONICERA",890.0,3],[854,"ACER",2000.0,3],[855,"CAMPSIS",1210.0,3],[856,"EONIMUS",980.0,3],[857,"LAVANDULA",450.0,3],[858,"LACKY BAMBU",1950.0,3],[859,"KANTA PO.",180.0,3],[860,"LANAC Z SAKS.",110.0,3],[861,"V.DJUBRIVO",2180.0,6],[862,"CLINIK P.",840.0,3],[863,"USLUGA R.",4800.0,3],[864,"LJUBICICA",480.0,3],[865,"BEGONIA SEMP.",150.0,3],[866,"HEBA",860.0,3],[867,"FITONIA",150.0,3],[868,"BEGONIA SEMPERF.",120.0,3],[869,"GAZANIA",300.0,3],[870,"DAHLIA",50.0,3],[871,"RUZMARIN",180.0,3],[872,"HIDROGENEA",680.0,3],[873,"WISTERIA",1980.0,3],[874,"TAGETES S.",20.0,3],[875,"SALVIA",350.0,3],[876,"PERENE",250.0,3],[877,"ACER",2376.0,3],[878,"CAREOPSIS",270.0,3],[879,"MAC",270.0,3],[880,"DIANTUS M.",150.0,3],[881,"PERENE V.",200.0,3],[882,"PETUNIJA O.",120.0,3],[883,"HOSTA",200.0,3],[884,"PL.TRAVA",150.0,3],[885,"SORBUS",670.0,3],[886,"CELOSIJA",80.0,3],[887,"CINIJA H.",60.0,3],[888,"ALISUM",120.0,3],[889,"EVONIMUS",1680.0,7],[890,"RODODENDRON",890.0,3],[891,"BOSIOK-",25.0,3],[892,"FUKSIA",250.0,3],[893,"PET.SURFINIA",120.0,3],[894,"TORBA A.",380.0,1],[895,"TORBA V.",750.0,1],[896,"ASTILBA",250.0,3],[897,"CODECIUM EX",760.0,3],[898,"LEPEZA",845.0,3],[899,"STENATA",1680.0,3],[900,"NEFROLEPSIS",2980.0,3],[901,"LOTOS-N.",930.0,3],[902,"DEPLANDIA",650.0,3],[903,"DRACENA C.",1250.0,7],[904,"THUJA REJNG.",650.0,3],[905,"THUJA HOLSTR.",250.0,3],[906,"BERBERIS",150.0,3],[907,"JUNIPERUS HORIZONT",486.0,3],[908,"JUNIPERUS BLU STAR",450.0,3],[909,"SJAJ ZA LIST",220.0,3],[910,"ORINTOGALUM",75.0,3],[911,"D.UKRAS",90.0,10],[912,"RAM ZA SL.",490.0,4],[913,"UKRAS",390.0,10],[914,"KAKTUS 1",620.0,7],[915,"KAKTUS",2550.0,7],[916,"LAMPA",2585.0,3],[917,"BUXUS",495.0,3],[918,"BUUUS S.",2376.0,3],[919,"SCIPIRUS",300.0,3],[920,"TRAKA 1M.A",10.0,10],[921,"TRAKA 1M.B",20.0,10],[922,"TRAKA 1M.C",30.0,10],[923,"TRAKA 1M.D",35.0,10],[924,"TRAKA 1M.E",80.0,10],[925,"TRAKA 1M.F",45.0,10],[926,"TRAKA 1M.G",50.0,10],[927,"HIPOESTES",1320.0,3],[928,"HRIZANTEMA**",150.0,5],[929,"IRIS",70.0,3],[930,"KRASPEDIA",40.0,3],[931,"ORINTOGALUM",250.0,3],[932,"ALSTROMELIA",150.0,3],[933,"PEPEROMIA",720.0,3],[934,"KESE",1.85,1],[935,"BRASICA",1560.0,3],[936,"SCIPIRUS",1890.0,3],[937,"ALOKASIJA",670.0,3],[938,"CIKLAMA S",450.0,7],[939,"ZVONO",365.0,3],[941,"VAZNA S.",980.0,11],[942,"VAZNA A.",1260.0,11],[943,"VAZNA B.",680.0,11],[944,"VAZNA C.",980.0,11],[945,"L.BAMBUS",450.0,7],[946,"KEKCIJA",12600.0,3],[947,"UKRAS",55.0,10],[948,"VAZNA",490.0,11],[949,"UKRAS 1",410.0,10],[950,"UKRAS 2",860.0,10],[951,"UKRAS 3",400.0,10],[952,"UKRAS 4",300.0,10],[953,"UKRAS 5",300.0,10],[954,"UKRAS 6",200.0,10],[955,"UKRAS 7",650.0,10],[956,"UKRAS 8",800.0,10],[957,"UKRAS 9",450.0,10],[958,"UKRAS 10",280.0,10],[959,"S.CVECE 1",120.0,0],[960,"S.CVECE 2",265.0,0],[961,"S.CVECE 3",195.0,0],[962,"UKRAS 11",360.0,10],[963,"UKRAS 12",155.0,10],[964,"UKRAS 13",160.0,10],[965,"S.CVECE 4",180.0,0],[966,"LACKY BAMBUS",1290.0,7],[967,"BONSAI",3200.0,3],[968,"BANBUS SPIRALIS",1730.0,3],[969,"BAMBUS S.",250.0,7],[970,"ORHIDEJA R.",750.0,7],[971,"DIZGOTEKA",3400.0,3],[972,"NARCISUS",120.0,5],[973,"MUSKARI",120.0,3],[974,"TRAVA 7.5",600.0,3],[975,"TRAVA 1",280.0,3],[976,"VINOVA LOZA",390.0,4],[977,"T.STRICTA",594.0,3],[978,"MALC",750.0,6],[979,"TAXUS",2800.0,3],[980,"PIERES",1250.0,3],[981,"HEESTERS",740.0,3],[982,"T.SMARAGD",864.0,3],[983,"FITO-INSEKC.",125.0,3],[984,"SJAJ ZA LIST",650.0,3],[985,"SINDAPSUS",900.0,3],[986,"U.KESA",35.0,3],[987,"VAZNA 1",1140.0,11],[988,"VAZNA 2",1750.0,11],[989,"VAZNA 3",2200.0,11],[990,"PUMPA F",8840.0,3],[991,"VIOLA",20.0,3],[992,"UKRAS",50.0,10],[993,"POZIVNICE",170.0,3],[994,"SANSEVERIJA",410.0,3],[995,"ORHIDEJA",2250.0,7],[996,"ORHIDEJA*",3650.0,7],[998,"GARDENIJA",530.0,3],[999,"ZEMLJA 1",890.0,6],[1000,"ZEMLJA 2",2480.0,6],[1001,"ZEMLJA 3",210.0,6],[1002,"CROCUS",80.0,3],[1003,"NARCIS",120.0,5],[1004,"PRIMULA",100.0,3],[1005,"RODODENDRON",1830.0,3],[1006,"RODODENDRON*",1760.0,3],[1007,"MITROS",440.0,3],[1008,"IMPATIJANS V.",120.0,3],[1009,"BACOPA",44.0,3],[1010,"LOBULARIJA",20.0,3],[1011,"CITRUS",4800.0,3],[1012,"ZEMLJA 5L",360.0,6],[1013,"ZEMLJA 4",450.0,6],[1014,"ZEMLJA 5L",580.0,6],[1015,"ZEMLJA 6",320.0,6],[1016,"ZEMLJA 7",1050.0,6],[1017,"OGLEDALO 1",820.0,4],[1018,"OGLEDALO 2",2480.0,4],[1019,"OGLEDALO 3",3140.0,4],[1020,"OGLEDALO 4",2790.0,4],[1021,"ACER",2480.0,3],[1022,"SKIMIA",280.0,3],[1023,"SINDAPSUS",1590.0,3],[1024,"PIERES",480.0,3],[1025,"BONSAI",1980.0,3],[1026,"LIVINGSTONA",1700.0,3],[1027,"AGAVA",380.0,3],[1028,"JUNKUS-",560.0,3],[1029,"LUDISIA",300.0,3],[1030,"SENECIO",150.0,3],[1031,"SUCULENTA1",890.0,3],[1032,"SUCULENTA",980.0,3],[1035,"DIFENBAHIJA COMP.",750.0,7],[1036,"DIFENBAHIJA",1170.0,7],[1037,"ZEMLJA 8",400.0,6],[1038,"ZEMLJA 9",420.0,6],[1039,"ABOTULION",220.0,3],[1040,"TAXUS",135.0,3],[1041,"HIDRANGEA",1170.0,3],[1042,"BUGUNVILEA",1980.0,3],[1043,"UBRUS",300.0,3],[1044,"T.PAPIR",57.0,3],[1045,"T.SAPUN",520.0,2],[1046,"K.SMECE",102.0,3],[1047,"CASA 1",40.0,4],[1048,"CASA 2",38.0,4],[1049,"WC CETKA",105.0,3],[1050,"KESA SMECE",101.57,3],[1051,"KASICICA ES.",280.0,3],[1052,"ZICA RO.",39.0,3],[1053,"BRISKO MOP",90.0,3],[1054,"PVC CASA",150.0,4],[1055,"KESA SMECE*",110.0,3],[1056,"ZAKACKA",20.0,3],[1057,"TELESKOP.DRSKA",55.0,3],[1058,"SALVETE 1",40.0,3],[1059,"SALVETA 2",72.0,3],[1060,"NOZ 1",1360.0,3],[1061,"SALVETE 3",33.5,3],[1062,"CASE 3",200.0,3],[1063,"UBRUS 1",100.0,3],[1064,"UBRUS 2",200.0,3],[1065,"ZOGER",270.0,3],[1066,"BURE PVC",75.0,3],[1067,"RUKAVICE",105.0,3],[1068,"UBRUS",260.0,3],[1069,"WC PREKRIVAC",980.0,3],[1070,"DRZAC PRE.",3.0,4],[1071,"KESE TREGE.",2.4,1],[1072,"METLA",250.0,3],[1073,"TRULEKS KRPA",105.0,3],[1075,"OFINGER",18.0,3],[1076,"AL.FOLIJA",720.0,1],[1077,"STREC FOLIJA",84.0,1],[1079,"KANTA",120.0,3],[1080,"PIKSLA",60.0,4],[1081,"OVAL",498.0,3],[1082,"CACKALICA",60.0,3],[1083,"PLIN.BOCA",95.0,3],[1084,"FOLIJA",420.0,1],[1085,"AQUAMAT",280.0,3],[1086,"F.KUTIJA",880.0,1],[1087,"KASICICE 1",250.0,3],[1088,"KASICICE 2",140.0,3],[1089,"KRPA 1",100.0,3],[1090,"M.KRPA",150.0,3],[1091,"AL.FOLIJA",649.0,1],[1092,"S.METLA",245.0,3],[1093,"KORPA",250.0,1],[1094,"CALISIA",560.0,3],[1095,"EUSTOMA",560.0,3],[1096,"CALADIUM",600.0,3],[1097,"MYRTUS",66.0,3],[1098,"TRADESKANTIA",250.0,3],[1099,"ARDISIA",1500.0,3],[1100,"FITONIA",120.0,3],[1101,"NERTERA",520.0,3],[1102,"MUHLENBLAHIA",720.0,3],[1103,"STEPHANOTIS",1980.0,3],[1104,"EVONIMUS",1680.0,7],[1105,"SLIKA 1",1230.0,3],[1106,"SLIKA 2",2030.0,3],[1107,"SLIKA 3",2970.0,3],[1108,"VINO A",485.0,4],[1109,"VINO B",580.0,4],[1110,"VINO C",770.0,4],[1111,"VINO D",360.0,4],[1112,"ACACIA",2860.0,3],[1113,"CORNUS",860.0,3],[1114,"CYTISUS",760.0,3],[1115,"PASIFLORA",1180.0,3],[1116,"WEIGELIA",350.0,3],[1117,"HAMMAMELIS",2100.0,3],[1118,"VIBURNUM",1600.0,3],[1119,"CYTISUS ST.",2550.0,3],[1120,"SIBLJE",500.0,3],[1122,"BUDLEA",960.0,3],[1123,"LJUSTAC",215.0,3],[1124,"UPALJAC",210.0,3],[1125,"NOZ",125.0,3],[1126,"OTVARAC",625.0,3],[1127,"VILJUSKA",30.0,3],[1128,"NOZ",135.0,3],[1129,"KASIKA",65.0,3],[1130,"LONCE",980.0,3],[1131,"CASA 4",95.0,4],[1132,"CACKALICA",65.0,3],[1133,"TANJIRI",108.0,4],[1134,"CASA 5",99.0,4],[1135,"CASA 6",48.0,4],[1136,"CASA 7",115.0,4],[1137,"CASA 8",190.0,4],[1138,"CASA 9",48.0,4],[1139,"CASA 10",120.0,4],[1140,"CASA 11",90.0,4],[1141,"CASA 12",95.0,4],[1142,"CASA 13",25.0,4],[1143,"CASA 14",110.0,4],[1144,"CASA 15",45.0,4],[1145,"DRZAC",8.0,4],[1146,"OSVEZIVAC",965.0,3],[1147,"HRIZANTEMA*",150.0,5],[1148,"OGRADA 1",230.0,3],[1149,"OGRADA 2",360.0,3],[1150,"OGRADA 3",660.0,3],[1151,"OGRADA 4",970.0,3],[1152,"PELINKOVAC",460.0,3],[1153,"MALC 1",900.0,6],[1154,"MALC 2",80.0,6],[1155,"MALC 3",650.0,6],[1156,"MALC 4",380.0,6],[1157,"MALC 5",450.0,6],[1158,"MALC 6",650.0,6],[1160,"PLATANUS",2376.0,3],[1161,"FRAXINUS",1670.0,3],[1162,"FRAXINUS.P.",2600.0,3],[6602,"BUKET 0730",730.0,0]]};
+const CATEGORIES = CATALOG_RAW.categories;
+const PRODUCTS = CATALOG_RAW.products.map(function(p){
+  return { code: p[0], name: p[1], price: p[2], category: CATEGORIES[p[3]] };
+});
+
+const PAYMENTS = [
+  { id: "gotovina", label: "Gotovina" },
+  { id: "kartica", label: "Kartica" },
+  { id: "prenos", label: "Prenos" }
+];
+
+const STORAGE_KEY = "cvecara_latica_sales_v1";
+const ICONS = {
+  plus: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+  trash: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>',
+  flower: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="2.6"/><path d="M12 2a3 3 0 0 1 3 3 3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1 3-3z"/><path d="M12 16a3 3 0 0 1 3 3 3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1 3-3z"/><path d="M22 12a3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3z"/><path d="M8 12a3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3z"/></svg>',
+  receipt: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 2h16v20l-3-2-3 2-3-2-3 2-3-2-1 2V2z"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/></svg>',
+  calendar: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+  trend: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',
+  package: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
+  x: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+  search: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
+  download: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+  upload: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>'
+};
+
+function uid() { return Math.random().toString(36).slice(2, 10) + Date.now().toString(36); }
+function todayISO() { return new Date().toISOString().slice(0, 10); }
+function formatRSD(n) { return new Intl.NumberFormat("sr-RS", { maximumFractionDigits: 0 }).format(Math.round(n)) + " RSD"; }
+function formatDateHuman(iso) {
+  const d = new Date(iso + "T00:00:00");
+  return d.toLocaleDateString("sr-RS", { day: "2-digit", month: "short" });
+}
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, function(c){
+    return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c];
+  });
+}
+
+const SEED = [
+  { id: uid(), date: todayISO(), product: "RUZA VENDELA", code: 6, category: "Rezano cveće", qty: 15, price: 110, customer: "", payment: "kartica" },
+  { id: uid(), date: todayISO(), product: "BUKET 0730", code: 6602, category: "Buketi i aranžmani", qty: 1, price: 730, customer: "", payment: "gotovina" }
+];
+
+function loadSales() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return SEED.slice();
+}
+let storageOK = true;
+function saveSales(sales) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(sales));
+    storageOK = true;
+  } catch (e) {
+    storageOK = false;
+  }
+}
+
+let state = {
+  sales: loadSales(),
+  filterCat: "sve",
+  filterRange: "30"
+};
+let pickedProduct = null; // { code, name, price, category } chosen from picker, or null for free text
+function computeStats() {
+  const sales = state.sales;
+  const today = todayISO();
+  const monthKey = today.slice(0, 7);
+  const revToday = sales.filter(function(s){ return s.date === today; }).reduce(function(sum,s){ return sum + s.qty * s.price; }, 0);
+  const revMonth = sales.filter(function(s){ return s.date.slice(0,7) === monthKey; }).reduce(function(sum,s){ return sum + s.qty * s.price; }, 0);
+  const revTotal = sales.reduce(function(sum,s){ return sum + s.qty * s.price; }, 0);
+
+  const byProduct = {};
+  sales.forEach(function(s){ byProduct[s.product] = (byProduct[s.product] || 0) + s.qty; });
+  let topProduct = "—", topQty = 0;
+  Object.keys(byProduct).forEach(function(name){
+    if (byProduct[name] > topQty) { topQty = byProduct[name]; topProduct = name; }
+  });
+  return { revToday: revToday, revMonth: revMonth, revTotal: revTotal, topProduct: topProduct, topQty: topQty };
+}
+
+function computeChartData() {
+  const days = [];
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const iso = d.toISOString().slice(0, 10);
+    days.push({ date: iso, label: formatDateHuman(iso), revenue: 0 });
+  }
+  const map = {};
+  days.forEach(function(d){ map[d.date] = d; });
+  state.sales.forEach(function(s){ if (map[s.date]) map[s.date].revenue += s.qty * s.price; });
+  return days;
+}
+
+function getFilteredSales() {
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - Number(state.filterRange));
+  const cutoffISO = state.filterRange === "sve" ? null : cutoff.toISOString().slice(0, 10);
+  return state.sales
+    .filter(function(s){ return state.filterCat === "sve" ? true : s.category === state.filterCat; })
+    .filter(function(s){ return cutoffISO ? s.date >= cutoffISO : true; })
+    .sort(function(a,b){ return a.date < b.date ? 1 : -1; });
+}
+
+function renderStatCards(stats) {
+  return '' +
+  '<section class="cv-stats">' +
+    '<div class="cv-stat-card"><div class="cv-stat-icon" style="background:var(--iris-soft);color:var(--iris)">'+ICONS.receipt+'</div><span class="cv-stat-label">Danas</span><span class="cv-stat-value">'+formatRSD(stats.revToday)+'</span></div>' +
+    '<div class="cv-stat-card"><div class="cv-stat-icon" style="background:var(--lilac-soft);color:var(--plum)">'+ICONS.calendar+'</div><span class="cv-stat-label">Ovaj mesec</span><span class="cv-stat-value">'+formatRSD(stats.revMonth)+'</span></div>' +
+    '<div class="cv-stat-card"><div class="cv-stat-icon" style="background:var(--gold-soft);color:var(--gold)">'+ICONS.trend+'</div><span class="cv-stat-label">Ukupan promet</span><span class="cv-stat-value">'+formatRSD(stats.revTotal)+'</span></div>' +
+    '<div class="cv-stat-card"><div class="cv-stat-icon" style="background:var(--lilac-soft);color:var(--plum)">'+ICONS.package+'</div><span class="cv-stat-label">Najprodavanije</span><span class="cv-stat-value cv-stat-value-sm" title="'+esc(stats.topProduct)+'">'+(stats.topProduct === "—" ? "—" : esc(stats.topProduct)+' ('+stats.topQty+')')+'</span></div>' +
+  '</section>';
+}
+
+function renderChart(chartData) {
+  const max = Math.max.apply(null, chartData.map(function(d){ return d.revenue; }).concat([1]));
+  const bars = chartData.map(function(d){
+    const h = Math.max(3, Math.round((d.revenue / max) * 140));
+    return '<div class="cv-bar-col"><div class="cv-bar" style="height:'+h+'px" title="'+esc(d.label)+': '+formatRSD(d.revenue)+'"></div><span class="cv-bar-label">'+esc(d.label)+'</span></div>';
+  }).join('');
+  return '<section class="cv-chart-card"><h2>Promet — poslednjih 14 dana</h2><div class="cv-chart-bars">'+bars+'</div></section>';
+}
+
+function renderTicket(s) {
+  const payLabel = (PAYMENTS.find(function(p){ return p.id === s.payment; }) || {}).label || s.payment;
+  return '' +
+  '<div class="cv-ticket" data-id="'+s.id+'">' +
+    '<div class="cv-ticket-notch cv-ticket-notch-l"></div>' +
+    '<div class="cv-ticket-notch cv-ticket-notch-r"></div>' +
+    '<div class="cv-ticket-main">' +
+      '<div class="cv-ticket-row1"><span class="cv-ticket-product">'+esc(s.product)+'</span><span class="cv-ticket-total">'+formatRSD(s.qty * s.price)+'</span></div>' +
+      '<div class="cv-ticket-meta">' +
+        '<span class="cv-tag">'+esc(s.category)+'</span>' +
+        (s.code != null ? '<span class="cv-code">#'+s.code+'</span>' : '') +
+        '<span>'+s.qty+' × '+formatRSD(s.price)+'</span>' +
+        '<span>'+formatDateHuman(s.date)+'</span>' +
+        '<span class="cv-pay">'+esc(payLabel)+'</span>' +
+        (s.customer ? '<span class="cv-customer">za: '+esc(s.customer)+'</span>' : '') +
+      '</div>' +
+    '</div>' +
+    '<button class="cv-ticket-del" data-action="delete" data-id="'+s.id+'" aria-label="Obriši prodaju">'+ICONS.trash+'</button>' +
+  '</div>';
+}
+
+function renderList() {
+  const filtered = getFilteredSales();
+  const catOptions = CATEGORIES.map(function(c){
+    return '<option value="'+esc(c)+'"'+(state.filterCat===c?' selected':'')+'>'+esc(c)+'</option>';
+  }).join('');
+  const rangeLabels = { "7":"Poslednjih 7 dana", "30":"Poslednjih 30 dana", "365":"Poslednjih godinu dana", "sve":"Sve vreme" };
+  const rangeOptions = Object.keys(rangeLabels).map(function(k){
+    return '<option value="'+k+'"'+(state.filterRange===k?' selected':'')+'>'+rangeLabels[k]+'</option>';
+  }).join('');
+
+  const body = filtered.length === 0
+    ? '<div class="cv-empty">'+ICONS.flower+'<p>Nema zabeleženih prodaja za izabrani period.</p><button class="cv-btn cv-btn-ghost" data-action="open-form">Dodaj prvu prodaju</button></div>'
+    : '<div class="cv-tickets">'+filtered.map(renderTicket).join('')+'</div>';
+
+  return '' +
+  '<section class="cv-list-section">' +
+    '<div class="cv-list-head">' +
+      '<h2>Evidencija prodaje</h2>' +
+      '<div class="cv-filters">' +
+        '<select id="filterCat"><option value="sve"'+(state.filterCat==="sve"?' selected':'')+'>Sve kategorije</option>'+catOptions+'</select>' +
+        '<select id="filterRange">'+rangeOptions+'</select>' +
+      '</div>' +
+    '</div>' +
+    body +
+  '</section>';
+}
+
+function renderTopBar() {
+  return '' +
+  '<header class="cv-header">' +
+    '<div class="cv-header-top">' +
+      '<div class="cv-brand">' +
+        '<div class="cv-brand-mark" style="color:var(--iris)">'+ICONS.flower+'</div>' +
+        '<div><h1>Cvećara Latica</h1><p class="cv-sub">Praćenje dnevne prodaje · '+PRODUCTS.length+' proizvoda u šifarniku</p></div>' +
+      '</div>' +
+      '<button class="cv-btn cv-btn-primary" data-action="open-form">'+ICONS.plus+'Nova prodaja</button>' +
+    '</div>' +
+    '<svg class="stem-divider" viewBox="0 0 600 24" preserveAspectRatio="none">' +
+      '<path d="M0 12 C 100 4, 200 20, 300 12 S 500 4, 600 12" stroke="var(--stem)" stroke-width="1.5" fill="none"/>' +
+      [40,140,240,340,440,540].map(function(x,i){ return '<circle cx="'+x+'" cy="'+(i%2===0?8:16)+'" r="3.2" fill="var(--iris)" opacity="0.85"/>'; }).join('') +
+    '</svg>' +
+    (!storageOK ? '<div class="cv-banner"><strong>Napomena:</strong> podaci trenutno ne mogu da se sačuvaju u ovom browseru (možda je privatni/inkognito režim ili je memorija puna). Koristi dugme „Izvezi backup" posle svakog unosa dok se ovo ne reši.</div>' : '') +
+    '<div class="cv-toolbar">' +
+      '<button class="cv-btn cv-btn-ghost cv-btn-sm" data-action="export-json">'+ICONS.download+'Izvezi backup (JSON)</button>' +
+      '<button class="cv-btn cv-btn-ghost cv-btn-sm" data-action="export-csv">'+ICONS.download+'Izvezi za Excel (CSV)</button>' +
+      '<button class="cv-btn cv-btn-ghost cv-btn-sm" data-action="import-json">'+ICONS.upload+'Uvezi backup</button>' +
+    '</div>' +
+  '</header>';
+}
+
+function renderApp() {
+  const stats = computeStats();
+  const chartData = computeChartData();
+  document.getElementById("app").innerHTML =
+    renderTopBar() +
+    renderStatCards(stats) +
+    renderChart(chartData) +
+    renderList();
+}
+function openModal() {
+  pickedProduct = null;
+  const catOptions = CATEGORIES.map(function(c){ return '<option value="'+esc(c)+'">'+esc(c)+'</option>'; }).join('');
+  const payOptions = PAYMENTS.map(function(p){ return '<option value="'+p.id+'">'+esc(p.label)+'</option>'; }).join('');
+
+  const overlay = document.createElement('div');
+  overlay.className = 'cv-modal-overlay';
+  overlay.id = 'modalOverlay';
+  overlay.innerHTML = '' +
+  '<div class="cv-modal" id="modalBox">' +
+    '<div class="cv-modal-head"><h3>Nova prodaja</h3><button type="button" class="cv-icon-btn" data-action="close-form" aria-label="Zatvori">'+ICONS.x+'</button></div>' +
+    '<label class="cv-field">' +
+      '<span>Proizvod</span>' +
+      '<div class="cv-picker" id="picker">' +
+        '<div class="cv-picker-input"><span class="cv-picker-icon">'+ICONS.search+'</span><input type="text" id="ppInput" placeholder="Pretraži po nazivu ili šifri…" autocomplete="off"></div>' +
+        '<div class="cv-picker-dropdown" id="ppDropdown"></div>' +
+      '</div>' +
+      '<span class="cv-picked-hint" id="pickedHint" style="display:none"></span>' +
+    '</label>' +
+    '<div class="cv-field-row">' +
+      '<label class="cv-field"><span>Kategorija</span><select id="fCategory">'+catOptions+'</select></label>' +
+      '<label class="cv-field"><span>Datum</span><input type="date" id="fDate" value="'+todayISO()+'"></label>' +
+    '</div>' +
+    '<div class="cv-field-row">' +
+      '<label class="cv-field"><span>Količina</span><input type="number" id="fQty" min="1" value="1"></label>' +
+      '<label class="cv-field"><span>Cena po komadu (RSD)</span><input type="number" id="fPrice" min="0" placeholder="0"></label>' +
+    '</div>' +
+    '<div class="cv-field-row">' +
+      '<label class="cv-field"><span>Kupac (opciono)</span><input type="text" id="fCustomer" placeholder="Ime kupca"></label>' +
+      '<label class="cv-field"><span>Način plaćanja</span><select id="fPayment">'+payOptions+'</select></label>' +
+    '</div>' +
+    '<div class="cv-modal-actions">' +
+      '<button type="button" class="cv-btn cv-btn-ghost" data-action="close-form">Otkaži</button>' +
+      '<button type="button" class="cv-btn cv-btn-primary" data-action="submit-form">Sačuvaj prodaju</button>' +
+    '</div>' +
+  '</div>';
+  document.body.appendChild(overlay);
+
+  overlay.addEventListener('click', function(e){ if (e.target === overlay) closeModal(); });
+
+  const ppInput = document.getElementById('ppInput');
+  const ppDropdown = document.getElementById('ppDropdown');
+
+  function renderDropdown(query) {
+    const q = query.trim().toLowerCase();
+    if (!q) { ppDropdown.classList.remove('open'); ppDropdown.innerHTML = ''; return; }
+    const byCode = /^\d+$/.test(q);
+    const results = PRODUCTS.filter(function(p){
+      return byCode ? String(p.code).indexOf(q) === 0 : p.name.toLowerCase().indexOf(q) !== -1;
+    }).slice(0, 30);
+    if (results.length === 0) {
+      ppDropdown.innerHTML = '<div class="cv-picker-empty">Nema poklapanja u šifarniku — koristiće se uneti naziv, podesi kategoriju i cenu ručno.</div>';
+    } else {
+      ppDropdown.innerHTML = results.map(function(p){
+        return '<button type="button" class="cv-picker-item" data-code="'+p.code+'"><span class="cv-picker-name">'+esc(p.name)+'</span><span class="cv-picker-meta"><span class="cv-picker-code">#'+p.code+'</span><span class="cv-picker-price">'+formatRSD(p.price)+'</span></span></button>';
+      }).join('');
+    }
+    ppDropdown.classList.add('open');
+  }
+
+  ppInput.addEventListener('input', function(){
+    pickedProduct = null;
+    document.getElementById('pickedHint').style.display = 'none';
+    renderDropdown(ppInput.value);
+  });
+  ppInput.addEventListener('focus', function(){ if (ppInput.value.trim()) renderDropdown(ppInput.value); });
+
+  ppDropdown.addEventListener('click', function(e){
+    const btn = e.target.closest('.cv-picker-item');
+    if (!btn) return;
+    const code = Number(btn.getAttribute('data-code'));
+    const p = PRODUCTS.find(function(pr){ return pr.code === code; });
+    if (!p) return;
+    pickedProduct = p;
+    ppInput.value = p.name;
+    document.getElementById('fCategory').value = p.category;
+    document.getElementById('fPrice').value = p.price;
+    const hint = document.getElementById('pickedHint');
+    hint.style.display = 'block';
+    hint.textContent = 'Iz šifarnika: šifra #' + p.code + ' · ' + formatRSD(p.price) + '/kom (možeš izmeniti ispod)';
+    ppDropdown.classList.remove('open');
+    ppDropdown.innerHTML = '';
+  });
+
+  document.addEventListener('mousedown', outsideClickHandler);
+  function outsideClickHandler(e) {
+    const picker = document.getElementById('picker');
+    if (picker && !picker.contains(e.target)) {
+      ppDropdown.classList.remove('open');
+    }
+  }
+  overlay._cleanup = function(){ document.removeEventListener('mousedown', outsideClickHandler); };
+
+  setTimeout(function(){ ppInput.focus(); }, 30);
+}
+
+function closeModal() {
+  const overlay = document.getElementById('modalOverlay');
+  if (overlay) {
+    if (overlay._cleanup) overlay._cleanup();
+    overlay.remove();
+  }
+}
+
+function submitForm() {
+  const product = document.getElementById('ppInput').value.trim();
+  const category = document.getElementById('fCategory').value;
+  const date = document.getElementById('fDate').value || todayISO();
+  const qty = Math.max(1, Number(document.getElementById('fQty').value) || 1);
+  const price = Number(document.getElementById('fPrice').value);
+  const customer = document.getElementById('fCustomer').value.trim();
+  const payment = document.getElementById('fPayment').value;
+
+  if (!product || !price || price <= 0) {
+    showToast('Unesi naziv proizvoda i cenu veću od nule.', 'error');
+    return;
+  }
+
+  const entry = {
+    id: uid(),
+    date: date,
+    product: product,
+    code: pickedProduct ? pickedProduct.code : null,
+    category: category,
+    qty: qty,
+    price: price,
+    customer: customer,
+    payment: payment
+  };
+  state.sales.unshift(entry);
+  saveSales(state.sales);
+  closeModal();
+  renderApp();
+  showToast(storageOK ? ('Dodato: ' + entry.product) : ('Dodato (nije sačuvano trajno — izvezi backup): ' + entry.product), storageOK ? 'ok' : 'error');
+}
+
+function deleteSale(id) {
+  const target = state.sales.find(function(s){ return s.id === id; });
+  state.sales = state.sales.filter(function(s){ return s.id !== id; });
+  saveSales(state.sales);
+  renderApp();
+  if (target) showToast('Obrisano: ' + target.product, 'ok');
+}
+
+let toastTimer = null;
+function showToast(msg, kind) {
+  let toast = document.getElementById('toast');
+  if (toast) toast.remove();
+  toast = document.createElement('div');
+  toast.id = 'toast';
+  toast.className = 'cv-toast' + (kind === 'error' ? ' cv-toast-error' : '');
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ toast.remove(); }, 2800);
+}
+function downloadBlob(content, filename, mime) {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+}
+
+function exportJSON() {
+  const content = JSON.stringify(state.sales, null, 2);
+  downloadBlob(content, 'cvecara-backup-' + todayISO() + '.json', 'application/json');
+  showToast('Backup preuzet (JSON).', 'ok');
+}
+
+function csvField(v) {
+  const s = String(v === null || v === undefined ? '' : v);
+  if (s.indexOf(';') !== -1 || s.indexOf('"') !== -1 || s.indexOf('\n') !== -1) {
+    return '"' + s.replace(/"/g, '""') + '"';
+  }
+  return s;
+}
+
+function exportCSV() {
+  const header = ['Datum','Proizvod','Šifra','Kategorija','Količina','Cena po komadu','Ukupno','Kupac','Način plaćanja'];
+  const rows = state.sales.map(function(s){
+    return [s.date, s.product, s.code == null ? '' : s.code, s.category, s.qty, s.price, s.qty*s.price, s.customer, (PAYMENTS.find(function(p){return p.id===s.payment;})||{}).label || s.payment]
+      .map(csvField).join(';');
+  });
+  const csv = '\ufeff' + header.map(csvField).join(';') + '\n' + rows.join('\n');
+  downloadBlob(csv, 'cvecara-prodaja-' + todayISO() + '.csv', 'text/csv;charset=utf-8');
+  showToast('CSV preuzet — otvori ga u Excelu.', 'ok');
+}
+
+function importJSON(file) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!Array.isArray(data)) throw new Error('bad format');
+      const valid = data.every(function(s){ return s && typeof s === 'object' && 'product' in s && 'price' in s && 'qty' in s; });
+      if (!valid) throw new Error('bad format');
+      const proceed = window.confirm('Ovo će zameniti trenutne podatke (' + state.sales.length + ' stavki) sa ' + data.length + ' stavki iz fajla. Nastaviti?');
+      if (!proceed) return;
+      state.sales = data.map(function(s){ return Object.assign({ id: s.id || uid() }, s); });
+      saveSales(state.sales);
+      renderApp();
+      showToast('Uvezeno ' + data.length + ' stavki.', 'ok');
+    } catch (err) {
+      showToast('Fajl nije validan backup ove aplikacije.', 'error');
+    }
+  };
+  reader.readAsText(file);
+}
+
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('[data-action]');
+  if (!btn) return;
+  const action = btn.getAttribute('data-action');
+  if (action === 'open-form') openModal();
+  else if (action === 'close-form') closeModal();
+  else if (action === 'submit-form') submitForm();
+  else if (action === 'delete') deleteSale(btn.getAttribute('data-id'));
+  else if (action === 'export-json') exportJSON();
+  else if (action === 'export-csv') exportCSV();
+  else if (action === 'import-json') document.getElementById('importFileInput').click();
+});
+
+document.addEventListener('change', function(e) {
+  if (e.target.id === 'filterCat') { state.filterCat = e.target.value; renderApp(); }
+  else if (e.target.id === 'filterRange') { state.filterRange = e.target.value; renderApp(); }
+  else if (e.target.id === 'importFileInput') {
+    const file = e.target.files[0];
+    if (file) importJSON(file);
+    e.target.value = '';
+  }
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+});
+
+saveSales(state.sales);
+renderApp();
+</script>
+</body>
+</html>
