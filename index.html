@@ -147,7 +147,7 @@ const PAYMENTS = [
   { id: "prenos", label: "Prenos" }
 ];
 
-const STORAGE_KEY = "cvecara_latica_sales_v1";
+const STORAGE_KEY = "cvecara_magic_sales_v1";
 const ICONS = {
   plus: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
   trash: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>',
@@ -159,7 +159,8 @@ const ICONS = {
   x: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
   search: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
   download: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
-  upload: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>'
+  upload: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>',
+  refresh: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>'
 };
 
 function uid() { return Math.random().toString(36).slice(2, 10) + Date.now().toString(36); }
@@ -180,28 +181,28 @@ const SEED = [
   { id: uid(), date: todayISO(), product: "BUKET 0730", code: 6602, category: "Buketi i aranžmani", qty: 1, price: 730, customer: "", payment: "gotovina" }
 ];
 
-function loadSales() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch (e) {}
-  return SEED.slice();
+function loadSalesAsync() {
+  if (typeof window.storage === "undefined") return Promise.resolve(null);
+  return window.storage.get(STORAGE_KEY, true).then(function(res) {
+    return res && res.value ? JSON.parse(res.value) : null;
+  }).catch(function(){ return null; });
 }
 let storageOK = true;
-function saveSales(sales) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(sales));
-    storageOK = true;
-  } catch (e) {
-    storageOK = false;
-  }
+let storageAvailable = typeof window.storage !== "undefined";
+function saveSalesAsync(sales) {
+  if (!storageAvailable) { storageOK = false; return Promise.resolve(false); }
+  return window.storage.set(STORAGE_KEY, JSON.stringify(sales), true).then(function(res) {
+    storageOK = !!res;
+    return storageOK;
+  }).catch(function(){ storageOK = false; return false; });
 }
 
 let state = {
-  sales: loadSales(),
+  sales: SEED.slice(),
   filterCat: "sve",
   filterRange: "30"
 };
+let dataReady = false;
 let pickedProduct = null; // { code, name, price, category } chosen from picker, or null for free text
 function computeStats() {
   const sales = state.sales;
@@ -317,7 +318,7 @@ function renderTopBar() {
     '<div class="cv-header-top">' +
       '<div class="cv-brand">' +
         '<div class="cv-brand-mark" style="color:var(--iris)">'+ICONS.flower+'</div>' +
-        '<div><h1>Cvećara Magic</h1><p class="cv-sub">Praćenje dnevne prodaje · '+PRODUCTS.length+' proizvoda u šifarniku</p></div>' +
+        '<div><h1>Cvećara Magic</h1><p class="cv-sub">Praćenje dnevne prodaje · '+PRODUCTS.length+' proizvoda u šifarniku'+(storageAvailable ? ' · <span style="color:var(--iris-dark);font-weight:600">deljeno uživo</span>' : ' · <span style="color:#8C3A3A;font-weight:600">samo ovaj uređaj</span>')+'</p></div>' +
       '</div>' +
       '<button class="cv-btn cv-btn-primary" data-action="open-form">'+ICONS.plus+'Nova prodaja</button>' +
     '</div>' +
@@ -325,8 +326,10 @@ function renderTopBar() {
       '<path d="M0 12 C 100 4, 200 20, 300 12 S 500 4, 600 12" stroke="var(--stem)" stroke-width="1.5" fill="none"/>' +
       [40,140,240,340,440,540].map(function(x,i){ return '<circle cx="'+x+'" cy="'+(i%2===0?8:16)+'" r="3.2" fill="var(--iris)" opacity="0.85"/>'; }).join('') +
     '</svg>' +
-    (!storageOK ? '<div class="cv-banner"><strong>Napomena:</strong> podaci trenutno ne mogu da se sačuvaju u ovom browseru (možda je privatni/inkognito režim ili je memorija puna). Koristi dugme „Izvezi backup" posle svakog unosa dok se ovo ne reši.</div>' : '') +
+    (!storageAvailable ? '<div class="cv-banner"><strong>Napomena:</strong> ova kopija nije otvorena kao živi Claude artefakt, pa promene neće biti vidljive drugim uređajima. Da bi svi (i sa telefona) videli iste podatke, otvori aplikaciju preko podeljenog linka artefakta, ne kao skinuti fajl. Za sada radi samo lokalni backup dugmad ispod.</div>' :
+     !storageOK ? '<div class="cv-banner"><strong>Napomena:</strong> poslednja promena nije uspela da se sačuva na deljenom prostoru — proveri konekciju i probaj „Osveži", ili izvezi backup da ništa ne izgubiš.</div>' : '') +
     '<div class="cv-toolbar">' +
+      '<button class="cv-btn cv-btn-ghost cv-btn-sm" data-action="refresh">'+ICONS.refresh+'Osveži</button>' +
       '<button class="cv-btn cv-btn-ghost cv-btn-sm" data-action="export-json">'+ICONS.download+'Izvezi backup (JSON)</button>' +
       '<button class="cv-btn cv-btn-ghost cv-btn-sm" data-action="export-csv">'+ICONS.download+'Izvezi za Excel (CSV)</button>' +
       '<button class="cv-btn cv-btn-ghost cv-btn-sm" data-action="import-json">'+ICONS.upload+'Uvezi backup</button>' +
@@ -472,19 +475,34 @@ function submitForm() {
     customer: customer,
     payment: payment
   };
-  state.sales.unshift(entry);
-  saveSales(state.sales);
   closeModal();
-  renderApp();
-  showToast(storageOK ? ('Dodato: ' + entry.product) : ('Dodato (nije sačuvano trajno — izvezi backup): ' + entry.product), storageOK ? 'ok' : 'error');
+  loadSalesAsync().then(function(latest){
+    if (latest) state.sales = latest;
+    state.sales.unshift(entry);
+    return saveSalesAsync(state.sales);
+  }).then(function(ok){
+    renderApp();
+    showToast(ok || !storageAvailable ? ('Dodato: ' + entry.product) : ('Dodato, ali nije sinhronizovano — probaj „Osveži": ' + entry.product), ok || !storageAvailable ? 'ok' : 'error');
+  });
 }
 
 function deleteSale(id) {
-  const target = state.sales.find(function(s){ return s.id === id; });
-  state.sales = state.sales.filter(function(s){ return s.id !== id; });
-  saveSales(state.sales);
-  renderApp();
-  if (target) showToast('Obrisano: ' + target.product, 'ok');
+  loadSalesAsync().then(function(latest){
+    if (latest) state.sales = latest;
+    const target = state.sales.find(function(s){ return s.id === id; });
+    state.sales = state.sales.filter(function(s){ return s.id !== id; });
+    return saveSalesAsync(state.sales).then(function(){ return target; });
+  }).then(function(target){
+    renderApp();
+    if (target) showToast('Obrisano: ' + target.product, 'ok');
+  });
+}
+
+function refreshSales() {
+  loadSalesAsync().then(function(latest){
+    if (latest) { state.sales = latest; renderApp(); showToast('Osveženo.', 'ok'); }
+    else showToast(storageAvailable ? 'Nema promena.' : 'Deljeno čuvanje nije dostupno u ovom režimu.', storageAvailable ? 'ok' : 'error');
+  });
 }
 
 let toastTimer = null;
@@ -547,9 +565,10 @@ function importJSON(file) {
       const proceed = window.confirm('Ovo će zameniti trenutne podatke (' + state.sales.length + ' stavki) sa ' + data.length + ' stavki iz fajla. Nastaviti?');
       if (!proceed) return;
       state.sales = data.map(function(s){ return Object.assign({ id: s.id || uid() }, s); });
-      saveSales(state.sales);
-      renderApp();
-      showToast('Uvezeno ' + data.length + ' stavki.', 'ok');
+      saveSalesAsync(state.sales).then(function(){
+        renderApp();
+        showToast('Uvezeno ' + data.length + ' stavki.', 'ok');
+      });
     } catch (err) {
       showToast('Fajl nije validan backup ove aplikacije.', 'error');
     }
@@ -568,6 +587,7 @@ document.addEventListener('click', function(e) {
   else if (action === 'export-json') exportJSON();
   else if (action === 'export-csv') exportCSV();
   else if (action === 'import-json') document.getElementById('importFileInput').click();
+  else if (action === 'refresh') refreshSales();
 });
 
 document.addEventListener('change', function(e) {
@@ -584,8 +604,41 @@ document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') closeModal();
 });
 
-saveSales(state.sales);
-renderApp();
+function renderLoading() {
+  document.getElementById("app").innerHTML =
+    '<div style="display:flex;align-items:center;justify-content:center;gap:10px;height:280px;color:var(--ink-soft)">' +
+    '<span style="color:var(--iris)">'+ICONS.flower+'</span><span>Učitavam deljene podatke…</span></div>';
+}
+
+function initApp() {
+  renderLoading();
+  loadSalesAsync().then(function(latest){
+    if (latest) {
+      state.sales = latest;
+    } else if (storageAvailable) {
+      // first time this shared key is used — seed it
+      saveSalesAsync(state.sales);
+    }
+    dataReady = true;
+    renderApp();
+  });
+}
+
+// Poll for changes from other devices/users every 7s (only while no modal is open,
+// so we never yank the form out from under someone mid-entry).
+setInterval(function(){
+  if (!storageAvailable || !dataReady) return;
+  if (document.getElementById('modalOverlay')) return;
+  loadSalesAsync().then(function(latest){
+    if (!latest) return;
+    if (JSON.stringify(latest) !== JSON.stringify(state.sales)) {
+      state.sales = latest;
+      renderApp();
+    }
+  });
+}, 7000);
+
+initApp();
 </script>
 </body>
 </html>
